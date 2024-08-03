@@ -1,110 +1,63 @@
-import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import {Container } from 'native-base'
-import Landing from './src/components/Landing/Landing';
+import MainScreen from './src/components/MainScreen';
+import LoginScreen from './src/components/LoginScreen';
+import SignupScreen from './src/components/SignupScreen';
 
-const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const TabBarIcon = (focused, name) => {
-  let iconImagePath;
-
-  if(name === "Main"){
-    iconImagePath = require("./src/assets/images/crown.png")
-  }
-  return (
-    <Image
-      source={iconImagePath}
-      style={{ width : focused ? 30 : 20, height: focused ? 30 : 20}}
-    />
-  )
-}
-
-
-const MainScreen = () => {
-  return (
-    <Tab.Navigator
-        tabBarOptions={{
-          activeBackgroundColor: "white",
-          activeTintColor: "black",
-          inactiveTintColor: "black",
-          style:{
-            backgroundColor: "white"
-          },
-          labelPosition: "below-icon",
-        }}
-        screenOptions={({route})=>({
-          tabBarLabel: route.name,
-          tabBarIcon: ({focused})=>(
-            TabBarIcon(focused, route.name)
-          ),
-        })}
-      >
-        <Tab.Screen name="Main" component={Landing}/>
-      </Tab.Navigator>
-  )
-}
-
-
-
-
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem('authToken');
+        setIsAuthenticated(!!token);
+      } catch (error) {
+        console.error('Error checking auth status', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  if (isLoading) {
+    return null; // 로딩 중일 때는 아무것도 표시하지 않거나 로딩 스피너 등을 표시할 수 있습니다.
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen 
-            name="Main" 
+        <Stack.Navigator initialRouteName="Main">
+          <Stack.Screen
+            name="Main"
             component={MainScreen}
             options={{
               headerTitle: "today clothes",
-              // headerRight: () => (
-              //   <RightHeader/>
-              // ),
-              // headerLeft: () => (
-              //   <LeftHeader/>
-              // ),
-              headerStyle: {
-                backgroundColor: "white"
-              },
-              headerTitleStyle: {
-                fontWeight: "bold",
-              }
+              headerStyle: { backgroundColor: "white" },
+              headerTitleStyle: { fontWeight: "bold" },
             }}
           />
-          {/* <Stack.Screen 
-            name="Contract"
-            component={ProjectContract}
-          /> */}
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
   );
 };
 
-
-
 export default App;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    text: {
-        fontSize: 25,
-        fontWeight: '500',
-    },
-})
+  container: {
+    flex: 1,
+  },
+});
