@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, Button } from 'react-native';
 
-const MainScreen = ({ navigation }) => {
+const MainScreen = ({ navigation }) => { # 어케?
   return (
     <View style={styles.container}>
       <View style={styles.header}>
