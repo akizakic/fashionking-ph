@@ -1,3 +1,4 @@
+// App.js
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -30,22 +31,14 @@ const App = () => {
   }, []);
 
   if (isLoading) {
-    return null; // 로딩 중일 때는 아무것도 표시하지 않거나 로딩 스피너 등을 표시할 수 있습니다.
+    return null; // 로딩 중일 때는 로딩 스피너 등을 표시할 수 있습니다.
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Main">
-          <Stack.Screen
-            name="Main"
-            component={MainScreen}
-            options={{
-              headerTitle: "today clothes",
-              headerStyle: { backgroundColor: "white" },
-              headerTitleStyle: { fontWeight: "bold" },
-            }}
-          />
+        <Stack.Navigator initialRouteName={isAuthenticated ? "Main" : "Login"}>
+          <Stack.Screen name="Main" component={MainScreen} options={{ headerTitle: "Main" }} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
         </Stack.Navigator>
